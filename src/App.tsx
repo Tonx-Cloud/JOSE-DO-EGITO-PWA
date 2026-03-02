@@ -266,7 +266,7 @@ const App: React.FC = () => {
   // ─── Renderização ─────────────────────────────────────────
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 bg-night-DEFAULT text-slate-100 font-body safe-top safe-bottom">
+    <div className="min-h-screen flex flex-col items-center p-4 sm:p-6 bg-night-DEFAULT text-slate-100 font-body safe-top safe-bottom">
 
       {/* ═══════════════ TELA: BOAS-VINDAS ═══════════════ */}
       {view === 'welcome' && (
@@ -553,32 +553,31 @@ const App: React.FC = () => {
 
       {/* ═══════════════ CONTEÚDO PRINCIPAL ═══════════════ */}
       {view !== 'welcome' && (
-        <main className="w-full max-w-xl z-10 p-6 sm:p-8 rounded-[2rem] border border-white/10 shadow-2xl bg-night-50/60 backdrop-blur-xl">
+        <main className="w-full max-w-xl z-10 flex-1 flex flex-col p-5 sm:p-6 rounded-[2rem] border border-white/10 shadow-2xl bg-night-50/60 backdrop-blur-xl">
 
           {/* ═══════ HOME ═══════ */}
           {view === 'home' && (
-            <div className="space-y-8">
-              <div className="text-center space-y-3">
-                <h2 className="text-2xl font-display font-semibold text-gold">
+            <div className="flex flex-col flex-1 gap-4">
+              <div className="text-center space-y-1">
+                <h2 className="text-xl font-display font-semibold text-gold">
                   Conte-me seu sonho
                 </h2>
-                <p className="text-lg text-slate-200 leading-relaxed">
-                  Grave um áudio contando seu sonho ou escreva abaixo.
-                  <br />Eu irei interpretá-lo para você.
+                <p className="text-base text-slate-200 leading-relaxed">
+                  Grave um áudio ou escreva abaixo.
                 </p>
               </div>
 
-              {/* Botão GRAVAR grande */}
+              {/* Botão GRAVAR compacto */}
               <button
                 onClick={startRecording}
                 aria-label="Gravar meu sonho"
-                className="w-full flex flex-col items-center justify-center gap-4 py-8 px-6
-                  bg-gold/10 border-2 border-gold/30 rounded-[1.5rem]
+                className="w-full flex items-center justify-center gap-4 py-5 px-6
+                  bg-gold/10 border-2 border-gold/30 rounded-2xl
                   hover:bg-gold/20 active:scale-[0.97] transition-all duration-200
                   focus:outline-none focus:ring-4 focus:ring-gold/40"
               >
-                <div className="w-20 h-20 rounded-full bg-gold flex items-center justify-center shadow-lg shadow-gold/30">
-                  <MicIcon className="w-10 h-10 text-night-DEFAULT" />
+                <div className="w-14 h-14 rounded-full bg-gold flex items-center justify-center shadow-lg shadow-gold/30">
+                  <MicIcon className="w-7 h-7 text-night-DEFAULT" />
                 </div>
                 <span className="text-xl font-bold text-gold">🎤 Gravar Meu Sonho</span>
               </button>
@@ -594,7 +593,7 @@ const App: React.FC = () => {
               <textarea
                 value={transcription}
                 onChange={(e) => setTranscription(e.target.value)}
-                className="w-full h-40 bg-night-100 border-2 border-white/15 rounded-2xl p-5
+                className="w-full flex-1 min-h-[100px] bg-night-100 border-2 border-white/15 rounded-2xl p-4
                   text-lg text-slate-50 leading-relaxed
                   outline-none focus:border-gold focus:ring-2 focus:ring-gold/30
                   resize-none transition-all placeholder-slate-500"
@@ -605,11 +604,11 @@ const App: React.FC = () => {
               {transcription.trim().length >= 5 && (
                 <button
                   onClick={handleInterpret}
-                  className="w-full py-5 px-6 rounded-2xl font-bold text-xl
+                  className="w-full py-4 px-6 rounded-2xl font-bold text-xl
                     bg-gold text-night-DEFAULT
                     active:scale-[0.97] transition-all duration-150
                     shadow-lg shadow-gold/20
-                    focus:outline-none focus:ring-4 focus:ring-gold/50 min-h-[4rem]"
+                    focus:outline-none focus:ring-4 focus:ring-gold/50 min-h-[3.5rem]"
                 >
                   ✨ Enviar para Interpretação
                 </button>
@@ -822,10 +821,10 @@ const App: React.FC = () => {
 
       {/* Footer */}
       {view !== 'welcome' && (
-        <footer className="mt-6 text-slate-600 text-[11px] tracking-widest uppercase z-10 text-center">
+        <footer className="py-3 text-slate-600 text-[10px] tracking-widest uppercase z-10 text-center">
           JOSÉ DO EGITO • INTERPRETADOR DE SONHOS<br />
           <span className="text-slate-700">POWERED BY GEMINI AI</span><br />
-          <span className="text-slate-500 normal-case tracking-normal text-[10px] mt-1 inline-block">By Ton Figueredo</span>
+          <span className="text-slate-500 normal-case tracking-normal text-[10px]">By Ton Figueredo</span>
         </footer>
       )}
 
