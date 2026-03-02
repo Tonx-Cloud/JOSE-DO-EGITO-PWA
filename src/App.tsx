@@ -562,7 +562,7 @@ const App: React.FC = () => {
                 <h2 className="text-2xl font-display font-semibold text-gold">
                   Conte-me seu sonho
                 </h2>
-                <p className="text-lg text-slate-400 leading-relaxed">
+                <p className="text-lg text-slate-200 leading-relaxed">
                   Grave um áudio contando seu sonho ou escreva abaixo.
                   <br />Eu irei interpretá-lo para você.
                 </p>
@@ -586,7 +586,7 @@ const App: React.FC = () => {
               {/* Separador */}
               <div className="flex items-center gap-4">
                 <div className="flex-1 h-px bg-white/10" />
-                <span className="text-slate-500 text-sm">ou escreva abaixo</span>
+                <span className="text-slate-300 text-sm">ou escreva abaixo</span>
                 <div className="flex-1 h-px bg-white/10" />
               </div>
 
@@ -594,8 +594,8 @@ const App: React.FC = () => {
               <textarea
                 value={transcription}
                 onChange={(e) => setTranscription(e.target.value)}
-                className="w-full h-40 bg-night-DEFAULT/60 border-2 border-white/15 rounded-2xl p-5
-                  text-lg text-slate-200 leading-relaxed
+                className="w-full h-40 bg-night-100 border-2 border-white/15 rounded-2xl p-5
+                  text-lg text-slate-50 leading-relaxed
                   outline-none focus:border-gold focus:ring-2 focus:ring-gold/30
                   resize-none transition-all placeholder-slate-500"
                 placeholder="Escreva aqui o que você sonhou..."
@@ -624,7 +624,7 @@ const App: React.FC = () => {
               <h2 className="text-2xl font-display font-medium text-gold">
                 🔴 Gravando...
               </h2>
-              <p className="text-lg text-slate-300 leading-relaxed">
+              <p className="text-lg text-slate-100 leading-relaxed">
                 Conte agora seu sonho com calma.<br />
                 Ao terminar, toque no botão abaixo.
               </p>
@@ -659,7 +659,7 @@ const App: React.FC = () => {
             <div className="py-16 text-center space-y-6">
               <div className="w-16 h-16 border-4 border-gold/15 border-t-gold rounded-full animate-spin mx-auto" />
               <p className="text-xl text-gold font-display">Ouvindo seu relato...</p>
-              <p className="text-base text-slate-400">Convertendo sua voz em texto.</p>
+              <p className="text-base text-slate-200">Convertendo sua voz em texto.</p>
             </div>
           )}
 
@@ -669,15 +669,15 @@ const App: React.FC = () => {
               <h2 className="text-2xl font-display font-semibold text-gold text-center">
                 Confira seu relato
               </h2>
-              <p className="text-base text-slate-400 text-center">
+              <p className="text-base text-slate-200 text-center">
                 Veja se o texto abaixo corresponde ao que você disse. Pode editar se precisar.
               </p>
 
               <textarea
                 value={transcription}
                 onChange={(e) => setTranscription(e.target.value)}
-                className="w-full h-48 bg-night-DEFAULT/60 border-2 border-white/15 rounded-2xl p-5
-                  text-lg text-slate-200 leading-relaxed
+                className="w-full h-48 bg-night-100 border-2 border-white/15 rounded-2xl p-5
+                  text-lg text-slate-50 leading-relaxed
                   outline-none focus:border-gold focus:ring-2 focus:ring-gold/30
                   resize-none transition-all"
               />
@@ -726,7 +726,7 @@ const App: React.FC = () => {
               {/* Relato original */}
               <div className="p-5 bg-night-DEFAULT/50 rounded-2xl border border-white/5">
                 <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-semibold">Seu relato:</p>
-                <p className="text-base text-slate-400 italic leading-relaxed">"{transcription}"</p>
+                <p className="text-base text-slate-100 italic leading-relaxed">"{transcription}"</p>
               </div>
 
               {/* Interpretação */}
