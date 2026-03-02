@@ -69,6 +69,22 @@ const InstallIcon = () => (
   </svg>
 );
 
+// ─── Ícones Menu ───────────────────────────────────────────────────────────
+
+const HamburgerIcon = () => (
+  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
+type MenuPage = null | 'sobre' | 'como-funciona' | 'contato' | 'ajude';
+
 // ─── Componente Principal ──────────────────────────────────────────────────
 
 const App: React.FC = () => {
@@ -82,6 +98,9 @@ const App: React.FC = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [narrationLoading, setNarrationLoading] = useState(false);
   const [welcomeFading, setWelcomeFading] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuPage, setMenuPage] = useState<MenuPage>(null);
+  const [pixCopied, setPixCopied] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -297,14 +316,232 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Header (exceto welcome) */}
+      {/* Header com menu e botão instalar (exceto welcome) */}
       {view !== 'welcome' && (
-        <header className="max-w-2xl w-full text-center mb-4 z-10">
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-gold leading-tight uppercase tracking-tight">
-            ✦ José do Egito ✦
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">Interpretador de Sonhos</p>
+        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-night-DEFAULT/80 backdrop-blur-md border-b border-white/5">
+          {/* Menu Hamburger */}
+          <button
+            onClick={() => { setMenuOpen(!menuOpen); setMenuPage(null); }}
+            aria-label="Menu"
+            className="w-11 h-11 flex items-center justify-center rounded-xl text-gold hover:bg-gold/10 active:scale-90 transition-all focus:outline-none focus:ring-2 focus:ring-gold/40"
+          >
+            {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
+          </button>
+
+          {/* Título central */}
+          <div className="text-center">
+            <h1 className="text-lg sm:text-xl font-display font-bold text-gold leading-tight uppercase tracking-tight">
+              ✦ José do Egito ✦
+            </h1>
+          </div>
+
+          {/* Botão Instalar (canto direito) */}
+          {canInstall ? (
+            <button
+              onClick={install}
+              aria-label="Instalar no celular"
+              className="w-11 h-11 flex items-center justify-center rounded-xl text-gold hover:bg-gold/10 active:scale-90 transition-all focus:outline-none focus:ring-2 focus:ring-gold/40"
+            >
+              <InstallIcon />
+            </button>
+          ) : (
+            <div className="w-11 h-11" />
+          )}
         </header>
+      )}
+
+      {/* Spacer para compensar header fixo */}
+      {view !== 'welcome' && <div className="h-16" />}
+
+      {/* ═══════ MENU LATERAL ═══════ */}
+      {menuOpen && view !== 'welcome' && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            onClick={() => { setMenuOpen(false); setMenuPage(null); }}
+          />
+          {/* Painel do menu */}
+          <nav className="fixed top-0 left-0 bottom-0 w-[80%] max-w-xs bg-night-DEFAULT border-r border-white/10 z-50 flex flex-col shadow-2xl menu-slide-in">
+            {/* Cabeçalho do menu */}
+            <div className="p-6 border-b border-white/10">
+              <h2 className="text-xl font-display font-bold text-gold">✦ Menu</h2>
+            </div>
+
+            {menuPage === null ? (
+              /* Lista de itens do menu */
+              <div className="flex-1 py-4">
+                <button
+                  onClick={() => setMenuPage('sobre')}
+                  className="w-full text-left px-6 py-4 text-lg text-slate-200 hover:bg-gold/10 hover:text-gold transition-all flex items-center gap-4"
+                >
+                  <span className="text-2xl">👤</span> Sobre Nós
+                </button>
+                <button
+                  onClick={() => setMenuPage('como-funciona')}
+                  className="w-full text-left px-6 py-4 text-lg text-slate-200 hover:bg-gold/10 hover:text-gold transition-all flex items-center gap-4"
+                >
+                  <span className="text-2xl">💡</span> Como Funciona
+                </button>
+                <button
+                  onClick={() => setMenuPage('contato')}
+                  className="w-full text-left px-6 py-4 text-lg text-slate-200 hover:bg-gold/10 hover:text-gold transition-all flex items-center gap-4"
+                >
+                  <span className="text-2xl">✉️</span> Contato
+                </button>
+                <div className="my-2 mx-6 border-t border-white/5" />
+                <button
+                  onClick={() => setMenuPage('ajude')}
+                  className="w-full text-left px-6 py-4 text-lg text-slate-200 hover:bg-gold/10 hover:text-gold transition-all flex items-center gap-4"
+                >
+                  <span className="text-2xl">❤️</span> Ajude o Desenvolvedor
+                </button>
+              </div>
+            ) : (
+              /* Conteúdo da página selecionada */
+              <div className="flex-1 overflow-y-auto">
+                <button
+                  onClick={() => setMenuPage(null)}
+                  className="w-full text-left px-6 py-3 text-sm text-gold hover:bg-gold/10 transition-all flex items-center gap-2 border-b border-white/5"
+                >
+                  ← Voltar
+                </button>
+
+                {menuPage === 'sobre' && (
+                  <div className="p-6 space-y-4">
+                    <h3 className="text-xl font-display font-bold text-gold">Sobre Nós</h3>
+                    <p className="text-base text-slate-300 leading-relaxed">
+                      O <strong className="text-gold">José do Egito</strong> é um aplicativo de
+                      interpretação de sonhos baseado na sabedoria bíblica.
+                    </p>
+                    <p className="text-base text-slate-300 leading-relaxed">
+                      Inspirado no personagem bíblico José, que recebeu de Deus o dom de
+                      interpretar sonhos, nosso app usa inteligência artificial para oferecer
+                      interpretações espirituais, simbólicas e práticas dos seus sonhos.
+                    </p>
+                    <p className="text-base text-slate-300 leading-relaxed">
+                      Desenvolvido com carinho especialmente para pessoas que buscam
+                      orientação e significado espiritual em seus sonhos. ✦
+                    </p>
+                  </div>
+                )}
+
+                {menuPage === 'como-funciona' && (
+                  <div className="p-6 space-y-4">
+                    <h3 className="text-xl font-display font-bold text-gold">Como Funciona</h3>
+                    <div className="space-y-4">
+                      <div className="flex gap-3">
+                        <span className="text-2xl">🎤</span>
+                        <div>
+                          <p className="text-base font-semibold text-gold">1. Conte seu sonho</p>
+                          <p className="text-sm text-slate-400">Grave um áudio ou digite o que você sonhou.</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <span className="text-2xl">✅</span>
+                        <div>
+                          <p className="text-base font-semibold text-gold">2. Confira o texto</p>
+                          <p className="text-sm text-slate-400">Se gravou áudio, confira a transcrição e edite se necessário.</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <span className="text-2xl">✨</span>
+                        <div>
+                          <p className="text-base font-semibold text-gold">3. Receba a interpretação</p>
+                          <p className="text-sm text-slate-400">José do Egito analisará seu sonho com sabedoria bíblica.</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <span className="text-2xl">🔊</span>
+                        <div>
+                          <p className="text-base font-semibold text-gold">4. Ouça ou salve</p>
+                          <p className="text-sm text-slate-400">Ouça a interpretação, baixe o texto ou o áudio narrado.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {menuPage === 'contato' && (
+                  <div className="p-6 space-y-4">
+                    <h3 className="text-xl font-display font-bold text-gold">Contato</h3>
+                    <p className="text-base text-slate-300 leading-relaxed">
+                      Tem alguma dúvida, sugestão ou quer nos enviar uma mensagem?
+                    </p>
+                    <a
+                      href="mailto:hiltonsf@gmail.com"
+                      className="block w-full py-4 px-5 rounded-2xl text-lg text-center
+                        bg-gold/10 border border-gold/30 text-gold
+                        hover:bg-gold/20 active:scale-[0.97] transition-all"
+                    >
+                      ✉️ hiltonsf@gmail.com
+                    </a>
+                    <p className="text-sm text-slate-500 text-center">
+                      Responderemos o mais breve possível.
+                    </p>
+                  </div>
+                )}
+
+                {menuPage === 'ajude' && (
+                  <div className="p-6 space-y-5">
+                    <h3 className="text-xl font-display font-bold text-gold">❤️ Ajude o Desenvolvedor</h3>
+                    <p className="text-base text-slate-300 leading-relaxed">
+                      Se o José do Egito trouxe luz e significado para seus sonhos,
+                      considere fazer uma contribuição para apoiar o desenvolvedor.
+                    </p>
+                    <p className="text-base text-slate-300 leading-relaxed">
+                      Qualquer valor é bem-vindo e ajuda a manter o projeto ativo! ✦
+                    </p>
+
+                    <div className="bg-night-DEFAULT/80 border border-gold/20 rounded-2xl p-4 space-y-3">
+                      <p className="text-sm text-gold font-semibold uppercase tracking-wider text-center">Chave PIX (copia e cola)</p>
+                      <div className="bg-black/30 rounded-xl p-3 text-[11px] text-slate-400 break-all leading-relaxed text-center font-mono select-all">
+                        00020126580014BR.GOV.BCB.PIX01366deb665d-6e79-4959-839e-6831db7307fb5204000053039865802BR5922Hilton Silva Figueredo6009SAO PAULO62140510NL03F2cJGk630489F1
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText('00020126580014BR.GOV.BCB.PIX01366deb665d-6e79-4959-839e-6831db7307fb5204000053039865802BR5922Hilton Silva Figueredo6009SAO PAULO62140510NL03F2cJGk630489F1');
+                          setPixCopied(true);
+                          setTimeout(() => setPixCopied(false), 3000);
+                        } catch {
+                          // fallback: selecionar texto manualmente
+                          const el = document.querySelector('.select-all') as HTMLElement;
+                          if (el) {
+                            const range = document.createRange();
+                            range.selectNodeContents(el);
+                            const sel = window.getSelection();
+                            sel?.removeAllRanges();
+                            sel?.addRange(range);
+                          }
+                        }
+                      }}
+                      className={`w-full py-4 px-5 rounded-2xl font-bold text-lg text-center
+                        transition-all active:scale-[0.97]
+                        ${pixCopied
+                          ? 'bg-green-600 text-white border border-green-500'
+                          : 'bg-gold text-night-DEFAULT shadow-lg shadow-gold/20'
+                        }`}
+                    >
+                      {pixCopied ? '✅ PIX Copiado!' : '📋 Copiar Código PIX'}
+                    </button>
+
+                    <p className="text-sm text-slate-500 text-center">
+                      Abra o app do seu banco, escolha “PIX Copia e Cola” e cole o código.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Rodapé do menu */}
+            <div className="p-4 border-t border-white/10 text-center">
+              <p className="text-xs text-slate-600">José do Egito © 2026</p>
+            </div>
+          </nav>
+        </>
       )}
 
       {/* Mensagem de erro */}
@@ -378,20 +615,6 @@ const App: React.FC = () => {
                 </button>
               )}
 
-              {/* Botão Instalar PWA */}
-              {canInstall && (
-                <button
-                  onClick={install}
-                  className="w-full py-4 px-6 rounded-2xl font-medium text-base
-                    border-2 border-dashed border-gold/30 text-gold
-                    hover:bg-gold/5 active:scale-[0.97] transition-all
-                    focus:outline-none focus:ring-4 focus:ring-gold/30
-                    flex items-center justify-center gap-3"
-                >
-                  <InstallIcon />
-                  Instalar na Área de Trabalho
-                </button>
-              )}
             </div>
           )}
 
@@ -601,7 +824,8 @@ const App: React.FC = () => {
       {view !== 'welcome' && (
         <footer className="mt-6 text-slate-600 text-[11px] tracking-widest uppercase z-10 text-center">
           JOSÉ DO EGITO • INTERPRETADOR DE SONHOS<br />
-          <span className="text-slate-700">POWERED BY GEMINI AI</span>
+          <span className="text-slate-700">POWERED BY GEMINI AI</span><br />
+          <span className="text-slate-500 normal-case tracking-normal text-[10px] mt-1 inline-block">By Ton Figueredo</span>
         </footer>
       )}
 
@@ -643,6 +867,14 @@ const App: React.FC = () => {
         @keyframes recordingWave {
           0%, 100% { height: 8px; }
           50% { height: 32px; }
+        }
+
+        .menu-slide-in {
+          animation: slideInLeft 0.25s ease-out;
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(0); }
         }
       `}</style>
     </div>
