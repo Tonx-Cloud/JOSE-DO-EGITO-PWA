@@ -1,0 +1,95 @@
+/* ─── Fontes Google ──────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base Global (otimizada para 60+) ───────────────────────── */
+@layer base {
+  html {
+    /* Base font-size maior para acessibilidade 60+ */
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-[#020617] text-slate-100 antialiased;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevenir zoom indesejado em iOS ao focar inputs */
+    touch-action: manipulation;
+  }
+
+  /* Garantir que inputs não causem zoom em iOS (min 16px) */
+  input, textarea, select {
+    font-size: max(1rem, 16px);
+  }
+
+  /* Links mais visíveis */
+  a {
+    color: #D4AF37;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* Focus visível e grande para acessibilidade */
+  *:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #020617, 0 0 0 6px rgba(212, 175, 55, 0.5);
+  }
+
+  /* Scrollbar suave */
+  * {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ─── Componentes Utilitários ────────────────────────────────── */
+@layer components {
+  /* Efeito de vidro (glass morphism) */
+  .glass {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Animação de pulso suave para gravação */
+  .pulse-record {
+    animation: pulseRecord 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseRecord {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+  }
+
+  /* Botão com área de toque generosa */
+  .btn-touch {
+    min-height: 3.5rem;
+    min-width: 3.5rem;
+    padding: 1rem 1.5rem;
+    /* 56px mínimo - acima do recomendado de 48px para 60+ */
+  }
+}
+
+/* ─── Utilidades PWA ─────────────────────────────────────────── */
+@layer utilities {
+  /* Prevenir seleção acidental de texto em botões */
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Status bar safe area para PWA standalone */
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
