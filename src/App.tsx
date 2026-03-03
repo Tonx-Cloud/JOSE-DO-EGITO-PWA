@@ -304,7 +304,7 @@ const App: React.FC = () => {
 
       {/* Header com menu e botão instalar (exceto welcome) */}
       {view !== 'welcome' && (
-        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-night-DEFAULT/80 backdrop-blur-md border-b border-white/5">
+        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-night-DEFAULT border-b border-white/10 shadow-lg">
           {/* Menu Hamburger */}
           <button
             onClick={() => { setMenuOpen(!menuOpen); setMenuPage(null); }}
