@@ -148,13 +148,66 @@ export const generateNarrationAudio = async (text: string): Promise<Blob> => {
     throw new Error('Resposta de TTS não contém áudio.');
   }
 
+  const mime = audioPart.inlineData.mimeType || 'audio/wav';
+  console.log('TTS mimeType:', mime);
+
   const byteCharacters = atob(audioPart.inlineData.data);
   const byteNumbers = new Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
     byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
-  const byteArray = new Uint8Array(byteNumbers);
-  return new Blob([byteArray], { type: audioPart.inlineData.mimeType || 'audio/mp3' });
+  const rawBytes = new Uint8Array(byteNumbers);
+
+  // Se o áudio é PCM cru (L16/linear16), adicionar header WAV
+  if (mime.includes('L16') || mime.includes('pcm') || mime.includes('raw') || !mime.includes('wav') && !mime.includes('mp3') && !mime.includes('ogg') && !mime.includes('mpeg')) {
+    // Gemini TTS retorna PCM 16-bit mono 24kHz por padrão
+    const sampleRate = 24000;
+    const numChannels = 1;
+    const bitsPerSample = 16;
+    const wavBlob = createWavBlob(rawBytes, sampleRate, numChannels, bitsPerSample);
+    return wavBlob;
+  }
+
+  return new Blob([rawBytes], { type: mime });
+};
+
+// Cria um Blob WAV a partir de dados PCM crus
+const createWavBlob = (pcmData: Uint8Array, sampleRate: number, numChannels: number, bitsPerSample: number): Blob => {
+  const dataSize = pcmData.length;
+  const headerSize = 44;
+  const buffer = new ArrayBuffer(headerSize + dataSize);
+  const view = new DataView(buffer);
+
+  // RIFF header
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(view, 8, 'WAVE');
+
+  // fmt sub-chunk
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true); // sub-chunk size
+  view.setUint16(20, 1, true); // PCM format
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true); // byte rate
+  view.setUint16(32, numChannels * (bitsPerSample / 8), true); // block align
+  view.setUint16(34, bitsPerSample, true);
+
+  // data sub-chunk
+  writeString(view, 36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  // PCM data
+  const wavBytes = new Uint8Array(buffer);
+  wavBytes.set(pcmData, headerSize);
+
+  return new Blob([wavBytes], { type: 'audio/wav' });
+};
+
+const writeString = (view: DataView, offset: number, str: string) => {
+  for (let i = 0; i < str.length; i++) {
+    view.setUint8(offset + i, str.charCodeAt(i));
+  }
 };
 
 // ─── Exportar o prompt para consulta ─────────────────────────

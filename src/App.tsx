@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { AppView } from './types';
-import { interpretDream, transcribeAudio, generateNarrationAudio } from './services/gemini';
+import { interpretDream, transcribeAudio } from './services/gemini';
 
 // ─── Hook: PWA Install Prompt ──────────────────────────────────────────────
 
@@ -55,13 +55,6 @@ const SpeakerIcon = () => (
   </svg>
 );
 
-const DownloadIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-  </svg>
-);
-
 const InstallIcon = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -96,7 +89,8 @@ const App: React.FC = () => {
   const [loadingMsg, setLoadingMsg] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [narrationLoading, setNarrationLoading] = useState(false);
+  const [textCopied, setTextCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [welcomeFading, setWelcomeFading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPage, setMenuPage] = useState<MenuPage>(null);
@@ -104,7 +98,6 @@ const App: React.FC = () => {
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const { canInstall, install } = useInstallPrompt();
 
@@ -143,43 +136,36 @@ const App: React.FC = () => {
 
   const stopAllAudio = useCallback(() => {
     window.speechSynthesis?.cancel();
-    narrationAudioRef.current?.pause();
     setIsSpeaking(false);
   }, []);
 
-  // ─── Download Texto ───────────────────────────────────────
+  // ─── Copiar Texto ─────────────────────────────────────────
 
-  const downloadText = () => {
-    const blob = new Blob(
-      [`JOSÉ DO EGITO - INTERPRETAÇÃO DO SEU SONHO\n${'═'.repeat(45)}\n\nSeu relato:\n"${transcription}"\n\nInterpretação:\n${interpretation}\n`],
-      { type: 'text/plain;charset=utf-8' }
-    );
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'jose-do-egito-interpretacao.txt';
-    a.click();
-    URL.revokeObjectURL(url);
+  const copyText = async () => {
+    const text = `JOSÉ DO EGITO - INTERPRETAÇÃO DO SEU SONHO\n${'═'.repeat(45)}\n\nSeu relato:\n"${transcription}"\n\nInterpretação:\n${interpretation}\n`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setTextCopied(true);
+      setTimeout(() => setTextCopied(false), 3000);
+    } catch {
+      setError('Não foi possível copiar o texto.');
+    }
   };
 
-  // ─── Download Áudio Narrado (Gemini TTS) ──────────────────
+  // ─── Compartilhar no WhatsApp ─────────────────────────────
 
-  const downloadNarration = async () => {
-    setNarrationLoading(true);
-    setError(null);
+  const shareWhatsApp = async () => {
+    const msg = `✦ *José do Egito — Interpretação do seu Sonho* ✦\n\n` +
+      `📖 _"${transcription}"_\n\n` +
+      `🔮 *Interpretação:*\n${interpretation}\n\n` +
+      `🌐 Interprete o seu sonho também:\nhttps://jose-do-egito-pwa.vercel.app`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
     try {
-      const blob = await generateNarrationAudio(interpretation);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'jose-do-egito-narracao.mp3';
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      setError('Não foi possível gerar a narração em áudio. Tente "Ouvir" com a voz do navegador.');
-    } finally {
-      setNarrationLoading(false);
-    }
+      await navigator.clipboard.writeText('https://jose-do-egito-pwa.vercel.app');
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 3000);
+    } catch { /* ignore */ }
+    window.open(waUrl, '_blank');
   };
 
   // ─── Gravação de Áudio ────────────────────────────────────
@@ -755,42 +741,38 @@ const App: React.FC = () => {
                   {isSpeaking ? '⏸ Parar de Ouvir' : '🔊 Ouvir Interpretação'}
                 </button>
 
-                {/* Baixar Texto */}
+                {/* Copiar Texto */}
                 <button
-                  onClick={downloadText}
-                  className="w-full py-4 px-5 rounded-2xl font-medium text-lg
-                    border border-white/15 text-slate-300
-                    hover:bg-white/5 active:scale-[0.97] transition-all
+                  onClick={copyText}
+                  className={`w-full py-4 px-5 rounded-2xl font-medium text-lg
+                    border transition-all active:scale-[0.97]
                     focus:outline-none focus:ring-4 focus:ring-gold/30
-                    flex items-center justify-center gap-3 min-h-[3.5rem]"
+                    flex items-center justify-center gap-3 min-h-[3.5rem]
+                    ${textCopied
+                      ? 'bg-green-600/20 border-green-500/40 text-green-300'
+                      : 'border-white/15 text-slate-300 hover:bg-white/5'
+                    }`}
                 >
-                  <DownloadIcon />
-                  📄 Baixar Texto
+                  {textCopied ? '✅ Texto Copiado!' : '📋 Copiar Texto'}
                 </button>
 
-                {/* Baixar Áudio Narrado */}
+                {/* Compartilhar WhatsApp */}
                 <button
-                  onClick={downloadNarration}
-                  disabled={narrationLoading}
-                  className="w-full py-4 px-5 rounded-2xl font-medium text-lg
-                    border border-white/15 text-slate-300
-                    hover:bg-white/5 active:scale-[0.97] transition-all
-                    disabled:opacity-40 disabled:cursor-wait
-                    focus:outline-none focus:ring-4 focus:ring-gold/30
-                    flex items-center justify-center gap-3 min-h-[3.5rem]"
+                  onClick={shareWhatsApp}
+                  className={`w-full py-4 px-5 rounded-2xl font-medium text-lg
+                    border transition-all active:scale-[0.97]
+                    focus:outline-none focus:ring-4 focus:ring-green-500/30
+                    flex items-center justify-center gap-3 min-h-[3.5rem]
+                    ${linkCopied
+                      ? 'bg-green-600/20 border-green-500/40 text-green-300'
+                      : 'bg-green-600/10 border-green-500/30 text-green-400 hover:bg-green-600/20'
+                    }`}
                 >
-                  {narrationLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-t-gold border-gold/20 rounded-full animate-spin" />
-                      Gerando narração...
-                    </>
-                  ) : (
-                    <>
-                      <DownloadIcon />
-                      🎧 Baixar Áudio Narrado
-                    </>
-                  )}
+                  {linkCopied ? '✅ Link copiado! Abrindo WhatsApp...' : '📤 Compartilhar no WhatsApp'}
                 </button>
+                <p className="text-xs text-slate-500 text-center -mt-1">
+                  Abre o WhatsApp com a interpretação pronta para enviar.
+                </p>
               </div>
 
               {/* Nova sessão */}
