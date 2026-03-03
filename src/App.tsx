@@ -348,9 +348,9 @@ const App: React.FC = () => {
             onClick={() => { setMenuOpen(false); setMenuPage(null); }}
           />
           {/* Painel do menu */}
-          <nav className="fixed top-0 left-0 bottom-0 w-[80%] max-w-xs bg-night-DEFAULT border-r border-white/10 z-50 flex flex-col shadow-2xl menu-slide-in">
+          <nav className="fixed top-0 left-0 bottom-0 w-[80%] max-w-xs bg-[#0a0e1a] border-r border-gold/20 z-50 flex flex-col shadow-2xl menu-slide-in">
             {/* Cabeçalho do menu */}
-            <div className="p-6 border-b border-white/10">
+            <div className="p-6 bg-[#0a0e1a] border-b border-gold/20">
               <h2 className="text-xl font-display font-bold text-gold">✦ Menu</h2>
             </div>
 
