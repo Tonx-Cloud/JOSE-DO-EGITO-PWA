@@ -344,7 +344,7 @@ const App: React.FC = () => {
         <>
           {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/90 z-40"
             onClick={() => { setMenuOpen(false); setMenuPage(null); }}
           />
           {/* Painel do menu */}
